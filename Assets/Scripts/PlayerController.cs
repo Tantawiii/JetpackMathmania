@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -12,11 +13,19 @@ public class PlayerController : MonoBehaviour
     public bool grounded;                   // is the player currently standing on the ground?
     public float stunDuration;              // duration of a stun
     private float stunStartTime;            // time that the player was stunned
+    public int playerHealth;
+    [SerializeField] private int obstDmg;
+
 
     // components
     public Rigidbody2D rig;                 // Rigidbody2D component
     public Animator anim;                   // Animator component
     public ParticleSystem jetpackParticle;  // ParticleSystem of jetpack
+    [SerializeField] private Image[] hearts;
+
+    private void Start(){
+        UpdateHealth();
+    }
 
     void FixedUpdate ()
     {
@@ -30,6 +39,17 @@ public class PlayerController : MonoBehaviour
             if(Time.time - stunStartTime >= stunDuration)
             {
                 curState = PlayerState.Idle;
+            }
+        }
+    }
+
+    public void UpdateHealth(){
+        for(int i =0; i< hearts.Length; i++){
+            if(i<playerHealth){
+                hearts[i].color = Color.red;
+            }
+            else{
+                hearts[i].color = Color.black;
             }
         }
     }
@@ -138,8 +158,15 @@ public class PlayerController : MonoBehaviour
             if(col.CompareTag("Obstacle"))
             {
                 Stun();
+                Damage();
             }
         }
+    }
+
+    void Damage(){
+        playerHealth -= obstDmg;
+        UpdateHealth();
+        //gameObject.SetActive(false);
     }
 }
 
